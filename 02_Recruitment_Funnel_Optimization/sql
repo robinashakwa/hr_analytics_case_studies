@@ -1,0 +1,29 @@
+/* =====================================================
+Project: Recruitment Funnel Optimization with Source ROI
+Assumed table: recruitment_data
+=====================================================
+
+Columns assumed:
+- application_id
+- candidate_id
+- source
+- role
+- recruiter
+- application_date
+- interview_date
+- offer_date
+- hire_date
+- hired_flag
+- first_year_performance_score
+- source_cost
+*/
+
+/* Funnel counts by source */
+SELECT
+  source,
+  COUNT(application_id) AS applications,
+  SUM(CASE WHEN interview_date IS NOT NULL THEN 1 ELSE 0 END) AS interviewed,
+  SUM(CASE WHEN offer_date IS NOT NULL THEN 1 ELSE 0 END) AS offers,
+  SUM(CASE WHEN hired_flag = 1 THEN 1 ELSE 0 END) AS hires
+FROM recruitment_data
+GROUP BY source;
