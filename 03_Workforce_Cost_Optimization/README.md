@@ -101,5 +101,3 @@ This data will be used for:
 - Power BI Dashboard  
 
 ---
-
-## 📄 Files in This Folder
