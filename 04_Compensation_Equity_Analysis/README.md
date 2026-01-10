@@ -77,6 +77,3 @@ This will be used in:
 - Power BI dashboard  
 
 ---
-
-## 📄 Files Included
-
