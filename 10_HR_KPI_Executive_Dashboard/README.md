@@ -1,80 +1,98 @@
-# 👥 Project 09: Headcount & Workforce Planning
+# 📊 Project 10: HR KPI Executive Dashboard
 
 ## 🎯 Objective
-This project helps HR understand:
-- How many employees the company has  
-- Who is joining and who is leaving  
-- Which departments are growing or shrinking  
-- Monthly workforce changes  
-- Hiring needs  
-- Future headcount forecast  
+This project builds the key HR metrics used by leadership for:
+- Strategic decision-making  
+- Budgeting  
+- Workforce planning  
+- Performance tracking  
+- Diversity & inclusion insights  
 
-This supports strategic workforce planning and budgeting.
+All KPIs are generated using SQL and later visualized in a Power BI dashboard.
 
 ---
 
 ## 🧠 Key Questions Answered
-1. What is the total employee headcount today?
-2. How many employees joined each month?
-3. How many employees left each month?
-4. Which departments lost or gained people?
-5. What is the net headcount change monthly?
-6. How many employees will we have next month?
-7. Which roles require hiring based on budget?
+1. What is the current company headcount?
+2. How many people joined or left each month?
+3. What is the total attrition rate?
+4. What is the gender ratio of the workforce?
+5. What is the average performance rating?
+6. How many people were promoted?
+7. How much time do employees miss due to absenteeism?
+8. What is the cost per employee?
+9. Which departments are growing the most?
 
 ---
 
 ## 📂 Datasets Used
-
 ### **employees**
 - employee_id  
 - full_name  
-- department  
+- gender  
 - hire_date  
 - termination_date  
-- job_role  
+- department  
 
-### **role_budget**
-- job_role  
-- budgeted_headcount  
+### **performance**  
+- employee_id  
+- performance_rating  
+
+### **promotions**  
+- employee_id  
+- promotion_status  
+
+### **absenteeism**  
+- employee_id  
+- absent_days  
+
+### **salaries**  
+- base_salary  
+- bonus  
+- daily_salary  
+
+### **training**  
+- training_cost  
+
+### **overtime**  
+- overtime_hours  
+- overtime_rate  
+
+### **hiring**  
+- recruitment_cost  
+- onboarding_cost  
 
 ---
 
-## 📊 Key Metrics Calculated
-- Current headcount  
-- Department-wise headcount  
-- Monthly joiners  
-- Monthly separations  
-- Net headcount change  
-- Hiring needs (per role)  
-- Forecasted headcount  
+## 📊 KPI Summary Calculated
+### ✔ Headcount  
+### ✔ Monthly hires  
+### ✔ Monthly attrition  
+### ✔ Attrition rate  
+### ✔ Gender ratio  
+### ✔ Average performance score  
+### ✔ Promotion rate  
+### ✔ Absenteeism rate  
+### ✔ Average cost per employee  
+### ✔ Department headcount  
 
 ---
 
 ## 🛠 SQL Summary
-
-### ✔ Current Headcount  
-All active employees (termination_date IS NULL).
-
-### ✔ Monthly Trends  
-Joiners vs Separations per month.
-
-### ✔ Net Change  
-`joiners - separations`
-
-### ✔ Forecasting  
-Uses average joiners & separations to predict future headcount.
-
-### ✔ Hiring Need  
-Compares actual headcount vs budgeted headcount.
+The SQL script calculates KPIs by combining multiple tables into easily readable metrics.  
+These metrics become the foundation for your **Power BI Executive Dashboard**.
 
 ---
 
-## 📈 Final Outputs
-- Employee movement analysis  
-- Departmental staffing trends  
-- Forecasted staffing levels  
-- Roles with hiring gaps  
-- HR strategic workforce dashboard inputs  
+## 📈 Final Output Includes
+- Headcount overview  
+- Workforce movement summary  
+- Cost & performance overview  
+- Gender & diversity ratios  
+- Departmental insights  
+
+This will be visualized in:
+- Excel dashboard  
+- Power BI HR KPI Dashboard  
 
 ---
