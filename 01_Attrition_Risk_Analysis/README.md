@@ -1,69 +1,73 @@
-📄 README.md — Attrition Risk Analysis (Project 01)
-🧑‍💼 HR Analytics Case Study — Attrition Risk Analysis
-📌 Project Overview
+📄 Attrition Risk Analysis — HR Analytics Case Study
+🧑‍💼 Project Overview
 
-Employee attrition is one of the most critical HR challenges. High turnover affects productivity, hiring costs, team morale, and long-term organizational performance.
+Employee attrition is a major challenge for HR teams. High turnover impacts:
 
-This project analyzes employee attrition using SQL, Excel, and Power BI to understand:
+Hiring costs
 
-Why employees leave
+Team productivity
 
-Which departments are most affected
+Engagement levels
 
-Attrition trends over time
+Organizational stability
 
-Performance & engagement patterns
-
-Insights for improving retention
-
-This is a real-world HR Analytics scenario used in interviews for HR Analyst, HR Operations, People Analytics, and Business Analyst roles.
+This project analyzes employee attrition using SQL, Excel, and Power BI to uncover patterns, identify high-risk areas, and provide data-driven recommendations for improving retention.
 
 🎯 Business Objective
 
-The goal is to:
+The goal of this analysis is to:
 
-Identify key attrition drivers
+Identify which departments and roles experience the highest attrition
 
-Find high-risk departments and job roles
+Understand key patterns such as performance, engagement, and tenure
 
-Build KPIs and dashboards for HR leadership
+Analyze monthly attrition trends
 
-Recommend data-backed actions to improve retention
-📊 Key KPIs
-| KPI                        | Description                               |
-| -------------------------- | ----------------------------------------- |
-| **Total Employees**        | Total employees in dataset                |
-| **Attrition Count**        | Number of employees who exited            |
-| **Attrition Rate**         | % Employees leaving the company           |
-| **Avg Engagement Score**   | Average engagement among active employees |
-| **Avg Performance Rating** | Overall employee performance              |
-| **Avg Salary**             | Average salary across departments         |
+Build KPIs and dashboards used by HR leadership
+
+Provide actionable recommendations to reduce turnover
+
+📊 Key Metrics (KPIs)
+| KPI                            | Description                              |
+| ------------------------------ | ---------------------------------------- |
+| **Total Employees**            | Total number of employees in the dataset |
+| **Attrition Count**            | Number of employees who exited           |
+| **Attrition Rate**             | Percentage of employees who left         |
+| **Average Salary**             | Company-wide average salary              |
+| **Average Performance Rating** | Overall performance rating               |
+| **Average Engagement Score**   | Engagement level among employees         |
 🗂 Dataset Description
-1. employees_cleaned.xlsx
-| Column             | Description                                        |
-| ------------------ | -------------------------------------------------- |
-| employee_id        | Unique employee identifier                         |
-| department         | HR, Sales, Finance, IT, Marketing                  |
-| job_role           | Analyst, Manager, Specialist, Executive, Associate |
-| tenure_days        | Total days worked                                  |
-| salary             | Annual salary                                      |
-| performance_rating | (1–5 scale)                                        |
-| engagement_score   | (1–100 scale)                                      |
-| is_active          | 1 = Active, 0 = Exited                             |
-2. attrition_cleaned.xlsx
-| Column      | Description                     |
-| ----------- | ------------------------------- |
-| employee_id | Matching ID from employee table |
-| exit_date   | Date of employee exit           |
-| exit_type   | Voluntary / Involuntary         |
-🧮 SQL Work (Data Processing)
-📁 SQL Files Included
-sql/
-│── 01_create_tables.sql  
-│── 02_attrition_queries.sql  
-│── 03_insights_queries.sql  
-📝 Example SQL Queries
-1. Create Employee Table
+employees_cleaned.xlsx
+| Column             | Description                                  |
+| ------------------ | -------------------------------------------- |
+| employee_id        | Unique employee identifier                   |
+| department         | Department of employment                     |
+| job_role           | Job role such as Manager, Analyst, Executive |
+| tenure_days        | Number of days employed                      |
+| salary             | Employee salary                              |
+| performance_rating | Rating from 1 to 5                           |
+| engagement_score   | Score from 1 to 100                          |
+| is_active          | 1 = Active, 0 = Exited                       |
+attrition_cleaned.xlsx
+| Column      | Description                               |
+| ----------- | ----------------------------------------- |
+| employee_id | Unique identifier matching employee table |
+| exit_date   | Date of exit                              |
+| exit_type   | Voluntary or involuntary                  |
+🧮 SQL Work
+
+SQL scripts used for:
+
+Cleaning raw datasets
+
+Creating employee and attrition tables
+
+Joining datasets
+
+Building metrics such as attrition by department, job role, and tenure
+
+Example Queries
+1️⃣ Create employee table
 CREATE TABLE employees_cleaned (
     employee_id INT,
     department VARCHAR(50),
@@ -74,108 +78,118 @@ CREATE TABLE employees_cleaned (
     engagement_score INT,
     is_active INT
 );
-2. Attrition Count
-SELECT COUNT(*) AS attrition_count
-FROM attrition_cleaned;
-3. Attrition by Department
+2️⃣ Attrition by Department
 SELECT e.department, COUNT(a.employee_id) AS exits
 FROM employees_cleaned e
 JOIN attrition_cleaned a USING (employee_id)
 GROUP BY e.department
 ORDER BY exits DESC;
+All SQL scripts are available in the /sql folder.
 📈 Power BI Dashboard
-📌 Dashboard Features
 
-✔ KPI cards
-✔ Attrition by Department
-✔ Attrition by Job Role
-✔ Attrition Trend Over Time
-✔ Interactive slicers
-✔ Employee Detail Table
-✔ Insights for HR
+The dashboard includes:
 
-📸 Dashboard Screenshots
+✔ KPI Cards
 
-(Add these files to /images/)
+Total Employees
 
-dashboard_overview.png
+Attrition Count
 
-attrition_by_department.png
+Attrition Rate
 
-attrition_trend.png
+Avg Salary
 
+Avg Performance
+
+Avg Engagement
+
+✔ Visualizations
+
+Attrition by Department (Bar Chart)
+
+Attrition by Job Role (Bar Chart)
+
+Attrition Trend Over Time (Line Chart)
+
+Slicers: Department, Job Role, Performance Rating
+
+Employee Detail Table
+
+✔ Dashboard Insights Summary
+
+Sales & Marketing have the highest attrition
+
+Finance shows the lowest attrition
+
+Attrition rate is 38.4%
+
+Majority exits occur early in tenure (<2 years)
+
+Lower engagement & performance correlate with higher attrition
+
+Peak exit months observed around mid-year
+
+Dashboard file:
+👉 project01_attrition_dashboard.pbix
 🔍 Insights Summary
-🟦 Department Insights
+🟦 Department-level Observations
 
-Sales & Marketing have the highest attrition.
+Sales and Marketing are high-risk areas
 
-Finance shows the most stability and lowest exits.
+Finance has better employee stability
 
 🟦 Job Role Insights
 
-Associates and Executives show higher turnover.
+Associates and Executives show higher turnover
 
-Manager-level attrition is lower.
-
-🟦 Tenure Insights
-
-Employees leaving early (<2 years) form the majority of exits.
+Manager-level attrition is relatively low
 
 🟦 Performance & Engagement
 
-Employees with lower engagement scores and lower performance ratings show higher exit rates.
+Lower engagement employees leave more often
 
-🟦 Trend Insights
+Performance rating 1–2 employees show higher risk
 
-Exit spikes are seen during mid-year (June–August).
+🟦 Tenure-based Observations
 
+High exits occur in the first 1–2 years of employment
 🧠 Recommendations for HR
 
-✔ Strengthen onboarding & buddy programs for new hires
-✔ Improve employee engagement initiatives
-✔ Conduct retention interviews in Sales & Marketing
-✔ Provide performance coaching for low-score employees
-✔ Offer career development paths and internal mobility
-
+✔ Improve onboarding experience for new employees
+✔ Launch engagement and wellness programs
+✔ Conduct stay interviews for high-risk job roles
+✔ Provide training and coaching for low performers
+✔ Monitor early-tenure employees more closely
+✔ Strengthen retention incentives in Sales & Marketing
 🛠 Tools Used
 
 Excel – Data cleaning
 
-SQL – Data processing and merging
+SQL – Data transformation & analysis
 
-Power BI – Dashboard & insights
+Power BI – Dashboard & reporting
 
-GitHub – Version control & documentation
-
-▶️ How to Run This Project
-
-Download the cleaned dataset from this folder
-
-Load Excel sheets into Power BI
-
-Create relationships using employee_id
-
-Create DAX measures for KPIs
-
-Reproduce visualizations and insights
-
+GitHub – Version control & project documentation
 📦 Project Structure
 01_Attrition_Risk_Analysis/
 │── README.md  
 │── project01_data_raw.xlsx  
 │── project01_data_cleaned.xlsx  
 │── project01_attrition_dashboard.pbix  
-│── powerbi/  
-│── images/
+│── images/  
 │── sql/  
-⭐ Final Note
+│── powerbi/  
+▶️ How to Run This Project
 
-This project demonstrates the complete lifecycle of HR Analytics:
+Download datasets from this folder
 
-✔ Data cleaning
-✔ SQL data modeling
-✔ Dashboard creation
-✔ Insights + recommendations
-✔ Professional documentation
+Load both Excel sheets into Power BI
 
-Perfect for showcasing HR Analytics capability to recruiters.
+Create relationship on employee_id
+
+Build DAX measures for KPIs
+
+Reproduce visuals
+
+Review insights & recommendations
+
