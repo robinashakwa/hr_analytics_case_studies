@@ -1,58 +1,43 @@
-/* =====================================================
-   Project: Enterprise Attrition Risk Analysis
-   Purpose: Create employee-level attrition risk dataset
-   ===================================================== */
-
 SELECT
     employee_id,
     department,
     job_role,
-    hire_date,
+    tenure_days,
     salary,
     engagement_score,
     performance_rating,
-    exit_date,
-    exit_type,
+    is_active,
 
-    -- Tenure in months
-    DATEDIFF(
-        MONTH,
-        hire_date,
-        COALESCE(exit_date, CURRENT_DATE)
-    ) AS tenure_months,
-
-    -- Voluntary attrition flag
+    -- Attrition flag
     CASE
-        WHEN exit_date IS NOT NULL
-             AND exit_type = 'Voluntary'
-        THEN 1
+        WHEN is_active = 0 THEN 1
         ELSE 0
-    END AS voluntary_attrition,
+    END AS attrition_flag,
 
-    -- Risk score
+    -- Risk score based on your available columns
     (
-        CASE WHEN DATEDIFF(MONTH, hire_date, CURRENT_DATE) > 24 THEN 25 ELSE 0 END +
-        CASE WHEN engagement_score < 40 THEN 25 ELSE 0 END +
-        CASE WHEN salary < 50000 THEN 20 ELSE 0 END +
-        CASE WHEN performance_rating <= 2 THEN 10 ELSE 0 END
+        CASE WHEN tenure_days/30 < 24 THEN 20 ELSE 0 END +
+        CASE WHEN engagement_score < 50 THEN 30 ELSE 0 END +
+        CASE WHEN performance_rating <= 2 THEN 30 ELSE 0 END +
+        CASE WHEN salary < 50000 THEN 20 ELSE 0 END
     ) AS risk_score,
 
-    -- Risk band
     CASE
-        WHEN (
-            CASE WHEN DATEDIFF(MONTH, hire_date, CURRENT_DATE) > 24 THEN 25 ELSE 0 END +
-            CASE WHEN engagement_score < 40 THEN 25 ELSE 0 END +
-            CASE WHEN salary < 50000 THEN 20 ELSE 0 END +
-            CASE WHEN performance_rating <= 2 THEN 10 ELSE 0 END
-        ) >= 70 THEN 'High Risk'
-        WHEN (
-            CASE WHEN DATEDIFF(MONTH, hire_date, CURRENT_DATE) > 24 THEN 25 ELSE 0 END +
-            CASE WHEN engagement_score < 40 THEN 25 ELSE 0 END +
-            CASE WHEN salary < 50000 THEN 20 ELSE 0 END +
-            CASE WHEN performance_rating <= 2 THEN 10 ELSE 0 END
-        ) BETWEEN 40 AND 69 THEN 'Medium Risk'
+        WHEN
+            (
+                CASE WHEN tenure_days/30 < 24 THEN 20 ELSE 0 END +
+                CASE WHEN engagement_score < 50 THEN 30 ELSE 0 END +
+                CASE WHEN performance_rating <= 2 THEN 30 ELSE 0 END +
+                CASE WHEN salary < 50000 THEN 20 ELSE 0 END
+            ) >= 70 THEN 'High Risk'
+        WHEN
+            (
+                CASE WHEN tenure_days/30 < 24 THEN 20 ELSE 0 END +
+                CASE WHEN engagement_score < 50 THEN 30 ELSE 0 END +
+                CASE WHEN performance_rating <= 2 THEN 30 ELSE 0 END +
+                CASE WHEN salary < 50000 THEN 20 ELSE 0 END
+            ) BETWEEN 40 AND 69 THEN 'Medium Risk'
         ELSE 'Low Risk'
     END AS risk_band
 
-FROM hr_attrition;
-
+FROM project01_data_cleaned;
