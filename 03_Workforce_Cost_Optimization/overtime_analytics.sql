@@ -5,9 +5,9 @@
    ============================================================ */
 
 
----------------------------------------------------------------
--- 1. BASE EMPLOYEE DATA
----------------------------------------------------------------
+/* -------------------------------------------------------------
+   1. BASE EMPLOYEE DATA
+   ------------------------------------------------------------- */
 SELECT
     employee_id,
     full_name,
@@ -20,9 +20,9 @@ FROM employees;
 
 
 
----------------------------------------------------------------
--- 2. SALARY COST
----------------------------------------------------------------
+/* -------------------------------------------------------------
+   2. SALARY COST
+   ------------------------------------------------------------- */
 SELECT
     e.employee_id,
     e.department,
@@ -35,9 +35,9 @@ LEFT JOIN salaries s
 
 
 
----------------------------------------------------------------
--- 3. OVERTIME COST
----------------------------------------------------------------
+/* -------------------------------------------------------------
+   3. OVERTIME COST
+   ------------------------------------------------------------- */
 SELECT
     o.employee_id,
     e.department,
@@ -50,9 +50,9 @@ LEFT JOIN employees e
 
 
 
----------------------------------------------------------------
--- 4. ABSENTEEISM COST
----------------------------------------------------------------
+/* -------------------------------------------------------------
+   4. ABSENTEEISM COST
+   ------------------------------------------------------------- */
 SELECT
     a.employee_id,
     e.department,
@@ -66,9 +66,9 @@ LEFT JOIN salaries s
 
 
 
----------------------------------------------------------------
--- 5. TRAINING COST
----------------------------------------------------------------
+/* -------------------------------------------------------------
+   5. TRAINING COST
+   ------------------------------------------------------------- */
 SELECT
     t.employee_id,
     e.department,
@@ -80,9 +80,9 @@ LEFT JOIN employees e
 
 
 
----------------------------------------------------------------
--- 6. HIRING COST
----------------------------------------------------------------
+/* -------------------------------------------------------------
+   6. HIRING COST
+   ------------------------------------------------------------- */
 SELECT
     h.employee_id,
     h.recruitment_cost,
@@ -92,31 +92,31 @@ FROM hiring h;
 
 
 
----------------------------------------------------------------
--- 7. FINAL WORKFORCE COST SUMMARY (MASTER REPORT)
----------------------------------------------------------------
+/* -------------------------------------------------------------
+   7. FINAL WORKFORCE COST SUMMARY (MASTER REPORT)
+   ------------------------------------------------------------- */
 
 SELECT
     e.employee_id,
     e.full_name,
     e.department,
 
-    -- Salary
+    /* Salary */
     (s.base_salary + s.bonus) AS total_salary_cost,
 
-    -- Overtime
+    /* Overtime */
     COALESCE(ot.overtime_cost, 0) AS overtime_cost,
 
-    -- Absenteeism
+    /* Absenteeism */
     COALESCE(ab.absenteeism_cost, 0) AS absenteeism_cost,
 
-    -- Training
+    /* Training */
     COALESCE(t.training_cost, 0) AS training_cost,
 
-    -- Hiring
+    /* Hiring */
     COALESCE(h.total_hiring_cost, 0) AS hiring_cost,
 
-    -- Total employee cost
+    /* Total employee cost */
     (
         (s.base_salary + s.bonus)
         + COALESCE(ot.overtime_cost, 0)
@@ -131,8 +131,9 @@ LEFT JOIN salaries s
     ON e.employee_id = s.employee_id
 
 LEFT JOIN (
-    SELECT employee_id,
-           (overtime_hours * overtime_rate) AS overtime_cost
+    SELECT
+        employee_id,
+        (overtime_hours * overtime_rate) AS overtime_cost
     FROM overtime
 ) ot
     ON e.employee_id = ot.employee_id
@@ -157,4 +158,3 @@ LEFT JOIN (
     FROM hiring
 ) h
     ON e.employee_id = h.employee_id;
-
