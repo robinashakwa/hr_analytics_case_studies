@@ -1,135 +1,132 @@
 /* =============================================================
    Project 04: Compensation Equity Analysis
-   Purpose: Identify unfair pay gaps across gender, role,
-            performance, and experience.
+   Purpose: Identify unfair pay gaps across gender, job role,
+            experience, and performance using compensation data.
    ============================================================= */
 
 
 /* =============================================================
-   1. BASE EMPLOYEE + SALARY DATA
+   1. BASE EMPLOYEE + SALARY + PERFORMANCE DATA
    ============================================================= */
 
-SELECT
-    e.employee_id,
-    e.full_name,
-    e.gender,
-    e.department,
-    e.job_role,
-    e.years_of_experience,
-    p.performance_rating,
-    s.base_salary,
-    s.bonus,
-    (s.base_salary + s.bonus) AS total_compensation
-FROM employees e
-LEFT JOIN salaries s
-    ON e.employee_id = s.employee_id
-LEFT JOIN performance p
-    ON e.employee_id = p.employee_id;
-
-
-
-/* =============================================================
-   2. MEDIAN SALARY PER JOB ROLE
-   ============================================================= */
-
-SELECT
-    job_role,
-    PERCENTILE_CONT(0.5)
-        WITHIN GROUP (ORDER BY total_compensation) AS median_salary
-FROM (
-    SELECT
-        e.job_role,
-        (s.base_salary + s.bonus) AS total_compensation
-    FROM employees e
-    LEFT JOIN salaries s
-        ON e.employee_id = s.employee_id
-) x
-GROUP BY job_role;
-
-
-
-/* =============================================================
-   3. GENDER PAY GAP BY JOB ROLE
-   ============================================================= */
-
-SELECT
-    job_role,
-    AVG(CASE WHEN gender = 'Male' THEN total_compensation END) AS avg_male_salary,
-    AVG(CASE WHEN gender = 'Female' THEN total_compensation END) AS avg_female_salary,
-    (
-        AVG(CASE WHEN gender = 'Male' THEN total_compensation END)
-        - AVG(CASE WHEN gender = 'Female' THEN total_compensation END)
-    ) AS gender_pay_gap
-FROM (
-    SELECT
-        e.gender,
-        e.job_role,
-        (s.base_salary + s.bonus) AS total_compensation
-    FROM employees e
-    LEFT JOIN salaries s
-        ON e.employee_id = s.employee_id
-) x
-GROUP BY job_role;
-
-
-
-/* =============================================================
-   4. PAY EQUITY SCORE PER EMPLOYEE
-   ============================================================= */
-
-SELECT
-    e.employee_id,
-    e.full_name,
-    e.job_role,
-    total_compensation,
-    m.median_salary,
-    
-    CASE
-        WHEN total_compensation >= m.median_salary * 0.9 THEN 'Fairly Paid'
-        ELSE 'Underpaid'
-    END AS pay_equity_status
-
-FROM (
+WITH base_data AS (
     SELECT
         e.employee_id,
         e.full_name,
+        e.gender,
+        e.department,
         e.job_role,
+        e.years_of_experience,
+        p.performance_rating,
+        s.base_salary,
+        s.bonus,
         (s.base_salary + s.bonus) AS total_compensation
     FROM employees e
     LEFT JOIN salaries s
         ON e.employee_id = s.employee_id
-) e
-LEFT JOIN (
+    LEFT JOIN performance p
+        ON e.employee_id = p.employee_id
+)
+
+
+/* =============================================================
+   2. MEDIAN COMPENSATION PER JOB ROLE
+   ============================================================= */
+, role_medians AS (
     SELECT
         job_role,
         PERCENTILE_CONT(0.5)
-           WITHIN GROUP (ORDER BY (base_salary + bonus)) AS median_salary
-    FROM salaries s
-    LEFT JOIN employees e
-        ON s.employee_id = e.employee_id
+             WITHIN GROUP (ORDER BY total_compensation) AS median_compensation
+    FROM base_data
     GROUP BY job_role
-) m
-ON e.job_role = m.job_role;
-
+)
 
 
 /* =============================================================
-   5. EXPERIENCE VS COMPENSATION FAIRNESS
+   3. MEDIAN PAY GAP BY GENDER (PER ROLE)
    ============================================================= */
-
-SELECT
-    e.employee_id,
-    e.full_name,
-    e.years_of_experience,
-    total_compensation,
-    AVG(total_compensation) OVER (PARTITION BY years_of_experience) AS avg_comp_for_experience_group
-FROM (
+, gender_pay_gap AS (
     SELECT
-        e.employee_id,
-        e.full_name,
-        e.years_of_experience,
-        (s.base_salary + s.bonus) AS total_compensation
-    FROM employees e
-    LEFT JOIN salaries s
-        ON e.employee_id = s.employee_id
-) e;
+        job_role,
+
+        /* Median male salary */
+        PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY total_compensation)
+        FILTER (WHERE gender = 'Male') AS median_male_salary,
+
+        /* Median female salary */
+        PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY total_compensation)
+        FILTER (WHERE gender = 'Female') AS median_female_salary
+
+    FROM base_data
+    GROUP BY job_role
+)
+
+
+/* =============================================================
+   4. EXPERIENCE vs COMPENSATION FAIRNESS
+   ============================================================= */
+, experience_avg AS (
+    SELECT
+        years_of_experience,
+        AVG(total_compensation) AS avg_comp_for_experience_group
+    FROM base_data
+    GROUP BY years_of_experience
+)
+
+
+/* =============================================================
+   5. FINAL MASTER COMPENSATION EQUITY REPORT
+   ============================================================= */
+SELECT
+    b.employee_id,
+    b.full_name,
+    b.gender,
+    b.department,
+    b.job_role,
+    b.years_of_experience,
+    b.performance_rating,
+
+    /* Compensation */
+    b.base_salary,
+    b.bonus,
+    b.total_compensation,
+
+    /* Median for job role */
+    rm.median_compensation AS role_median_salary,
+
+    /* Pay Equity Score */
+    ROUND(b.total_compensation / rm.median_compensation, 2) AS pay_equity_score,
+
+    /* Fairness Tag */
+    CASE
+        WHEN b.total_compensation >= rm.median_compensation * 0.90
+            THEN 'Fairly Paid'
+        ELSE 'Underpaid'
+    END AS pay_equity_status,
+
+    /* Gender pay gap (role level) */
+    gpg.median_male_salary,
+    gpg.median_female_salary,
+    (gpg.median_male_salary - gpg.median_female_salary) AS gender_pay_gap_amount,
+    ROUND(
+        (gpg.median_male_salary - gpg.median_female_salary)
+        / NULLIF(gpg.median_male_salary, 0), 3
+    ) AS gender_pay_gap_percentage,
+
+    /* Experience comparison */
+    ea.avg_comp_for_experience_group,
+    ROUND(
+        b.total_compensation / ea.avg_comp_for_experience_group,
+        2
+    ) AS experience_salary_index
+
+FROM base_data b
+LEFT JOIN role_medians rm
+    ON b.job_role = rm.job_role
+LEFT JOIN gender_pay_gap gpg
+    ON b.job_role = gpg.job_role
+LEFT JOIN experience_avg ea
+    ON b.years_of_experience = ea.years_of_experience
+
+ORDER BY b.employee_id;
+
